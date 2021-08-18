@@ -35,8 +35,6 @@
 #import "KSJSONCodecObjC.h"
 #import "KSCrashMonitor_System.h"
 
-#define CPU_SUBTYPE_ARM64E              ((cpu_subtype_t) 2)
-
 #if defined(__LP64__)
     #define FMT_LONG_DIGITS "16"
     #define FMT_RJ_SPACES "18"
@@ -212,8 +210,12 @@ static NSDictionary* g_registerOrders;
     kscrash_callCompletion(onCompletion, filteredReports, YES, nil);
 }
 
-- (NSString*) CPUType:(NSString*) CPUArch
+- (NSString*) CPUType:(NSString*) CPUArch isSystemInfoHeader: BOOL
 {
+    if(isSystemInfoHeader && [CPUArch rangeOfString:@"arm64e"].location == 0)
+    {
+        return @"ARM-64 (Native)";
+    }
     if([CPUArch rangeOfString:@"arm64"].location == 0)
     {
         return @"ARM-64";
@@ -256,19 +258,15 @@ static NSDictionary* g_registerOrders;
             }
             return @"arm";
         }
-#ifdef CPU_TYPE_ARM64
         case CPU_TYPE_ARM64:
         {
             switch (minorCode)
             {
-#ifdef CPU_SUBTYPE_ARM64E
                 case CPU_SUBTYPE_ARM64E:
                     return @"arm64e";
-#endif
             }
             return @"arm64";
         }
-#endif
         case CPU_TYPE_X86:
             return @"i386";
         case CPU_TYPE_X86_64:
@@ -438,7 +436,7 @@ static NSDictionary* g_registerOrders;
     NSMutableString* str = [NSMutableString string];
     NSString* executablePath = [system objectForKey:@KSCrashField_ExecutablePath];
     NSString* cpuArch = [system objectForKey:@KSCrashField_CPUArch];
-    NSString* cpuArchType = [self CPUType:cpuArch];
+    NSString* cpuArchType = [self CPUType:cpuArch isSystemInfoHeader:YES];
 
     [str appendFormat:@"Incident Identifier: %@\n", reportID];
     [str appendFormat:@"CrashReporter Key:   %@\n", [system objectForKey:@KSCrashField_DeviceAppHash]];
@@ -522,7 +520,7 @@ static NSDictionary* g_registerOrders;
     }
     int threadIndex = [[thread objectForKey:@KSCrashField_Index] intValue];
 
-    NSString* cpuArchType = [self CPUType:cpuArch];
+    NSString* cpuArchType = [self CPUType:cpuArch isSystemInfoHeader:NO];
 
     NSMutableString* str = [NSMutableString string];
 
