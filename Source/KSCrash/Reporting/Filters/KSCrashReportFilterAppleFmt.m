@@ -45,9 +45,10 @@
 
 #define FMT_PTR_SHORT        @"0x%" PRIxPTR
 #define FMT_PTR_LONG         @"0x%0" FMT_LONG_DIGITS PRIxPTR
-#define FMT_PTR_RJ           @"%#" FMT_RJ_SPACES PRIxPTR
+//#define FMT_PTR_RJ           @"%#" FMT_RJ_SPACES PRIxPTR
+#define FMT_PTR_RJ           @"%" PRIxPTR
 #define FMT_OFFSET           @"%" PRIuPTR
-#define FMT_TRACE_PREAMBLE       @"%-4d%-31s " FMT_PTR_LONG
+#define FMT_TRACE_PREAMBLE       @"%-4d%-30s\t " FMT_PTR_LONG
 #define FMT_TRACE_UNSYMBOLICATED FMT_PTR_SHORT @" + " FMT_OFFSET
 #define FMT_TRACE_SYMBOLICATED   @"%@ + " FMT_OFFSET
 
@@ -72,9 +73,12 @@
  *
  * @param CPUArch The CPU architecture name.
  *
+ * @param isSystemInfoHeader Whether it is going to be used or not for system Information header
+ *
  * @return the major CPU type.
+
  */
-- (NSString*) CPUType:(NSString*) CPUArch;
+- (NSString*) CPUType:(NSString*) CPUArch isSystemInfoHeader:(BOOL) isSystemInfoHeader;
 
 /** Determine the CPU architecture based on major/minor CPU architecture codes.
  *
@@ -441,20 +445,20 @@ static NSDictionary* g_registerOrders;
     [str appendFormat:@"Incident Identifier: %@\n", reportID];
     [str appendFormat:@"CrashReporter Key:   %@\n", [system objectForKey:@KSCrashField_DeviceAppHash]];
     [str appendFormat:@"Hardware Model:      %@\n", [system objectForKey:@KSCrashField_Machine]];
-    [str appendFormat:@"Process:         %@ [%@]\n",
+    [str appendFormat:@"Process:             %@ [%@]\n",
      [system objectForKey:@KSCrashField_ProcessName],
      [system objectForKey:@KSCrashField_ProcessID]];
-    [str appendFormat:@"Path:            %@\n", executablePath];
-    [str appendFormat:@"Identifier:      %@\n", [system objectForKey:@KSCrashField_BundleID]];
-    [str appendFormat:@"Version:         %@ (%@)\n",
+    [str appendFormat:@"Path:                %@\n", executablePath];
+    [str appendFormat:@"Identifier:          %@\n", [system objectForKey:@KSCrashField_BundleID]];
+    [str appendFormat:@"Version:             %@ (%@)\n",
      [system objectForKey:@KSCrashField_BundleVersion],
      [system objectForKey:@KSCrashField_BundleShortVersion]];
-    [str appendFormat:@"Code Type:       %@\n", cpuArchType];
-    [str appendFormat:@"Parent Process:  ? [%@]\n",
+    [str appendFormat:@"Code Type:           %@\n", cpuArchType];
+    [str appendFormat:@"Parent Process:      ? [%@]\n",
      [system objectForKey:@KSCrashField_ParentProcessID]];
     [str appendFormat:@"\n"];
-    [str appendFormat:@"Date/Time:       %@\n", [self stringFromDate:crashTime]];
-    [str appendFormat:@"OS Version:      %@ %@ (%@)\n",
+    [str appendFormat:@"Date/Time:           %@\n", [self stringFromDate:crashTime]];
+    [str appendFormat:@"OS Version:          %@ %@ (%@)\n",
      [system objectForKey:@KSCrashField_SystemName],
      [system objectForKey:@KSCrashField_SystemVersion],
      [system objectForKey:@KSCrashField_OSVersion]];
@@ -494,18 +498,21 @@ static NSDictionary* g_registerOrders;
             NSString* path = [image objectForKey:@KSCrashField_Name];
             NSString* name = [path lastPathComponent];
             NSString* uuid = [self toCompactUUID:[image objectForKey:@KSCrashField_UUID]];
-            NSString* isBaseImage = (path && [executablePath isEqualToString:path]) ? @"+" : @" ";
-
+            //NSString* isBaseImage = (path && [executablePath isEqualToString:path]) ? @"+" : @" ";
+            NSString* isBaseImage = @"";
+            NSString* arch = [self CPUArchForMajor:cpuType minor:cpuSubtype];
             [str appendFormat:FMT_PTR_RJ @" - " FMT_PTR_RJ @" %@%@ %@  <%@> %@\n",
              imageAddr,
              imageAddr + imageSize - 1,
              isBaseImage,
              name,
-             [self CPUArchForMajor:cpuType minor:cpuSubtype],
+             arch,
              uuid,
              path];
         }
     }
+
+    [str appendString:@"\nEOF\n\n"];
 
     return str;
 }
