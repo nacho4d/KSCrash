@@ -210,7 +210,7 @@ static NSDictionary* g_registerOrders;
     kscrash_callCompletion(onCompletion, filteredReports, YES, nil);
 }
 
-- (NSString*) CPUType:(NSString*) CPUArch isSystemInfoHeader: BOOL
+- (NSString*) CPUType:(NSString*) CPUArch isSystemInfoHeader:(BOOL) isSystemInfoHeader
 {
     if(isSystemInfoHeader && [CPUArch rangeOfString:@"arm64e"].location == 0)
     {
