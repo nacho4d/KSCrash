@@ -473,6 +473,14 @@ static NSDictionary* g_registerOrders;
     NSDictionary* system = [self systemReport:report];
     NSString* executablePath = [system objectForKey:@KSCrashField_ExecutablePath];
 
+    NSString *str1 = FMT_PTR_SHORT;
+    NSString *str2 = FMT_PTR_LONG;
+    NSString *str3 = FMT_PTR_RJ;
+    NSString *str4 = FMT_OFFSET;
+    NSString *str5 = FMT_TRACE_PREAMBLE;
+    NSString *str6 = FMT_TRACE_UNSYMBOLICATED;
+    NSString *str7 = FMT_TRACE_SYMBOLICATED;
+
     [str appendString:@"\nBinary Images:\n"];
     if(binaryImages)
     {
@@ -498,7 +506,8 @@ static NSDictionary* g_registerOrders;
             NSString* uuid = [self toCompactUUID:[image objectForKey:@KSCrashField_UUID]];
             NSString* isBaseImage = (path && [executablePath isEqualToString:path]) ? @"+" : @" ";
 
-            [str appendFormat:FMT_PTR_RJ @" - " FMT_PTR_RJ @" %@%@ %@  <%@> %@\n",
+            NSString *fmt = FMT_PTR_RJ @" - " FMT_PTR_RJ @" %@%@ %@  <%@> %@\n";
+            [str appendFormat:fmt,
              imageAddr,
              imageAddr + imageSize - 1,
              isBaseImage,
