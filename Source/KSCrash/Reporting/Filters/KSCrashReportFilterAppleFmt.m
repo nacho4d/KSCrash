@@ -113,11 +113,11 @@
     BOOL otherContainsNum = [other rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]].location != NSNotFound;
 
     if (containsNum && !otherContainsNum) {
-        return NSOrderedDescending;
-    } else if (!containsNum && otherContainsNum) {
         return NSOrderedAscending;
+    } else if (!containsNum && otherContainsNum) {
+        return NSOrderedDescending;
     } else {
-        return [self compare:other];
+        return [other compare:self];
     }
 }
 
@@ -495,8 +495,8 @@ static NSDictionary* g_registerOrders;
     NSMutableString* str = [NSMutableString string];
 
     NSArray* binaryImages = [self binaryImagesReport:report];
-    NSDictionary* system = [self systemReport:report];
-    NSString* executablePath = [system objectForKey:@KSCrashField_ExecutablePath];
+    //NSDictionary* system = [self systemReport:report];
+    //NSString* executablePath = [system objectForKey:@KSCrashField_ExecutablePath];
 
     [str appendString:@"\nBinary Images:\n"];
     if(binaryImages)

@@ -64,6 +64,46 @@
     KSLOG_ERROR(str);
 }
 
+- (void) testRegSort
+{
+    <__NSArrayI_Transfer 0x28337c9a0>(
+    x21,
+    x29,
+    x2,
+    x16,
+    x3,
+    x22,
+    x4,
+    x17,
+    cpsr,
+    x5,
+    x23,
+    x6,
+    x18,
+    x10,
+    lr,
+    x7,
+    x24,
+    x11,
+    x8,
+    x19,
+    x25,
+    x9,
+    x12,
+    fp,
+    x26,
+    x13,
+    pc,
+    x27,
+    x14,
+    x20,
+    x0,
+    sp,
+    x28,
+    x15,
+    "x1"
+}
+
 - (void) testLogAlways
 {
     KSLOG_ALWAYS(@"TEST");
