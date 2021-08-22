@@ -100,6 +100,29 @@
 
 @end
 
+@interface NSString (CompareRegisterNames)
+
+- (NSComparisonResult)kscrash_compareRegisterName:(NSString *)other;
+
+@end
+
+@implementation NSString (CompareRegisterNames)
+
+- (NSComparisonResult)kscrash_compareRegisterName:(NSString *)other {
+    BOOL containsNum = [self rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]].location != NSNotFound;
+    BOOL otherContainsNum = [other rangeOfCharacterFromSet:[NSCharacterSet decimalDigitCharacterSet]].location != NSNotFound;
+
+    if (containsNum && !otherContainsNum) {
+        return NSOrderedDescending;
+    } else if (!containsNum && otherContainsNum) {
+        return NSOrderedAscending;
+    } else {
+        return [self compare:other];
+    }
+}
+
+@end
+
 
 @implementation KSCrashReportFilterAppleFmt
 
@@ -538,7 +561,7 @@ static NSDictionary* g_registerOrders;
     NSArray* regOrder = [g_registerOrders objectForKey:cpuArch];
     if(regOrder == nil)
     {
-        regOrder = [[registers allKeys] sortedArrayUsingSelector:@selector(compare:)];
+        regOrder = [[registers allKeys] sortedArrayUsingSelector:@selector(kscrash_compareRegisterName:)];
     }
     NSUInteger numRegisters = [regOrder count];
     NSUInteger i = 0;
