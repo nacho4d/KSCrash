@@ -30,6 +30,7 @@
 
 #import <inttypes.h>
 #import <mach/machine.h>
+#include <mach-o/arch.h>
 
 #import "KSCrashReportFields.h"
 #import "KSJSONCodecObjC.h"
@@ -48,7 +49,7 @@
 //#define FMT_PTR_RJ           @"%#" FMT_RJ_SPACES PRIxPTR
 #define FMT_PTR_RJ           @"%#" PRIxPTR
 #define FMT_OFFSET           @"%" PRIuPTR
-#define FMT_TRACE_PREAMBLE       @"%-4d%-30s\t " FMT_PTR_LONG
+#define FMT_TRACE_PREAMBLE       @"%-4d%-30s\t" FMT_PTR_LONG
 #define FMT_TRACE_UNSYMBOLICATED FMT_PTR_SHORT @" + " FMT_OFFSET
 #define FMT_TRACE_SYMBOLICATED   @"%@ + " FMT_OFFSET
 
@@ -264,6 +265,12 @@ static NSDictionary* g_registerOrders;
 
 - (NSString*) CPUArchForMajor:(cpu_type_t) majorCode minor:(cpu_subtype_t) minorCode
 {
+    // In Apple platforms we can use this nice function to get the name of a particular architecture
+    const NXArchInfo* info = NXGetArchInfoFromCpuType(majorCode, minorCode);
+    if (info && info->name) {
+        return [[NSString alloc] initWithUTF8String: info->name];
+    }
+
     switch(majorCode)
     {
         case CPU_TYPE_ARM:
